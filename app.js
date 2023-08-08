@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
 
 
 // encrypt the password with environment variable
-const secret = "Thisisourlittlesecret."
+const secret = process.env.SECRET;
 userSchema.plugin(encrypt, {secret: secret, encryptedFields: ["password"]});
 
 // create model for user
