@@ -3,7 +3,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import ejs from "ejs";
 import mongoose from "mongoose";
-import encrypt from "mongoose-encryption";
+import md5 from "md5";
 
 
 const app = express();
@@ -32,9 +32,6 @@ const userSchema = new mongoose.Schema({
 });
 
 
-// encrypt the password with environment variable
-const secret = process.env.SECRET;
-userSchema.plugin(encrypt, {secret: secret, encryptedFields: ["password"]});
 
 // create model for user
 const User = mongoose.model("User", userSchema);
@@ -55,7 +52,8 @@ app.get("/register", async (req, res) => {
 // registration
 app.post("/register", async (req, res) => {
     const userEmail = req.body.username;
-    const userPassword = req.body.password;
+    // use hashing to hash password
+    const userPassword = md5(req.body.password);
     
     const isUserFound = await User.findOne({email: userEmail});
     
@@ -68,16 +66,19 @@ app.post("/register", async (req, res) => {
         });
         
         await user.save();
+        res.render("secrets");
     } else {
         console.log("User already exists.");
-        res.render("secrets");
+        const message = "<p>*This email has already registered. Please login</p>"
+        res.render("register", {alreadyRegistered: message});
     }
 });
 
 // login
 app.post("/login", async(req, res) => {
     const userEmail = req.body.username;
-    const userPassword = req.body.password;
+    
+    const userPassword = md5(req.body.password);
 
     const isUserFound = await User.findOne({email: userEmail});
 
