@@ -9,6 +9,7 @@
         <div class="card-body">
           <!-- Makes POST request to /login route -->
           <form action="/login" method="POST">
+            <%-locals.message%>
             <%- locals.onWrongCredential %>
             <div class="form-group">
               <label for="email">Email</label>
